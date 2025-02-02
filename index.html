@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Treasure Collector</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Optional inline styles for the start screen */
+    #start-container {
+      text-align: center;
+      padding: 20px;
+    }
+    #start-title {
+      font-size: 48px;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    #game-rules {
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    #game-rules ul {
+      list-style-type: disc;
+      padding-left: 20px;
+    }
+    #element-description {
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    .element-item {
+      display: inline-block;
+      margin: 0 10px;
+      vertical-align: top;
+    }
+    .element-item img {
+      width: 50px;
+      height: 50px;
+      display: block;
+      margin: 0 auto 5px;
+    }
+    .start-button {
+      font-size: 24px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    /* Exit button styles */
+    #exit-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 24px;
+      padding: 10px 20px;
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    #exit-button:hover {
+      background-color: darkred;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-container">
+    <div id="start-title" style="font-size: 80px; color: gold;">Treasure Collector</div>
+
+    <!-- Game rules section -->
+    <div id="game-rules">
+      <h2>Rules of the game</h2>
+      <ul style="list-style-type: none;">
+        <li>Collect treasures to increase your score</li>
+        <br>
+        <li>Avoid obstacles which reduce your score and time in hand</li>
+        <br>
+        <li>You have 200 seconds to complete all five levels</li>
+        <br>
+        <li>Advance through levels by collecting all available treasures</li>
+        <br>
+        <li>The game ends after Level 5!</li>
+      </ul>
+    </div>
+
+    <!-- Element description section -->
+    <div id="element-description">
+      <h2>Game elements</h2>
+      <div class="element-item">
+        <img src="assets/gold.png" alt="Gold">
+        <span>Gold: 5 points</span>
+      </div>
+      <div class="element-item">
+        <img src="assets/silver.png" alt="Silver">
+        <span>Silver: 3 points</span>
+      </div>
+      <div class="element-item">
+        <img src="assets/bronze.png" alt="Bronze">
+        <span>Bronze: 1 point</span>
+      </div>
+      <div class="element-item">
+        <img src="assets/spinning_blade.gif" alt="Spinning Blades">
+        <span>Obstacle: -10 points</span>
+      </div>
+      <div class="element-item">
+        <img src="assets/rocks.png" alt="Rocks">
+        <span>Rocks: -10 points</span>
+      </div>
+    </div>
+    <br><br>
+    <button id="start-button" onclick="startGame()" style="font-size: 50px; padding: 10px 20px;">Start</button>
+  </div>
+
+  <div id="ui-container" style="display:none;">
+    <div class="ui-item" id="score">SCORE: 0</div>
+    <div class="ui-item" id="time">TIME: 200</div>
+    <div class="ui-item" id="level">LEVEL: 1</div>
+  </div>
+  <div id="game-container" style="display:none;"></div>
+  <div id="game-over-message" style="display:none;"></div>
+  <div id="level-up-message" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:48px; color:#fff; z-index:1000;"></div>
+
+  <!-- Exit Button -->
+  <button id="exit-button" onclick="exitGame()">Exit Game</button>
+
+  <script src="game.js"></script>
+  <script>
+    // Function to handle exiting the game
+    function exitGame() {
+      if (gameInstance) {
+        gameInstance.destroy(true);
+      }
+      document.getElementById('game-container').style.display = 'none';
+      document.getElementById('ui-container').style.display = 'none';
+      document.getElementById('start-container').style.display = 'block';
+      document.getElementById('exit-button').style.display = 'none';  // Hide exit button when game is reset
+    }
+
+    // Function to start the game and ensure the exit button is visible
+    function startGame() {
+      // Ensure exit button is visible when game starts
+      document.getElementById('exit-button').style.display = 'block';
+
+      // Cleanup previous game
+      if (gameInstance) {
+        gameInstance.destroy(true);
+        document.getElementById('game-container').innerHTML = '';
+      }
+
+      // Create new game
+      gameInstance = new Phaser.Game(CONFIG);
+
+      // Update UI visibility
+      document.getElementById('start-container').style.display = 'none';
+      document.getElementById('ui-container').style.display = 'flex';
+      document.getElementById('game-container').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
