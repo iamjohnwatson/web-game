@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Treasure Collector</title>
+
+  <!-- Link to the favicon -->
+  <link rel="icon" href="assets/favicon.png" type="image/png">
+
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
   <link rel="stylesheet" href="style.css">
   <style>
@@ -46,15 +50,31 @@
       cursor: pointer;
     }
 
-    /* Style for "Made by Akash Sriram" text */
+    /* Styling for the "Made by Akash Sriram" text */
     #credits {
-      position: fixed;
-      top: 20px;  /* Adjust this to move it higher */
-      left: 10px;
+      position: absolute;
+      bottom: 30px;
+      left: 30px;
       font-size: 18px;
-      color: white;
+      color: #fff;
       font-family: Arial, sans-serif;
-      z-index: 1000; /* Ensure it stays on top */
+    }
+
+    /* Styling for the exit button */
+    #exit-button {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      font-size: 18px;
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    #exit-button:hover {
+      background-color: #ff3333;
     }
   </style>
 </head>
@@ -115,8 +135,11 @@
   <div id="game-over-message" style="display:none;"></div>
   <div id="level-up-message" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:48px; color:#fff; z-index:1000;"></div>
 
-  <!-- "Made by Akash Sriram" credits text -->
+  <!-- Credits Text -->
   <div id="credits">Made by Akash Sriram</div>
+
+  <!-- Exit Button -->
+  <button id="exit-button" onclick="exitGame()">Exit</button>
 
   <script src="game.js"></script>
 </body>
