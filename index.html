@@ -8,6 +8,9 @@
   <!-- Link to the favicon -->
   <link rel="icon" href="assets/favicon.png" type="image/png">
 
+  <!-- Link to Google Font "Press Start 2P" -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
   <link rel="stylesheet" href="style.css">
   <style>
@@ -20,6 +23,7 @@
       font-size: 48px;
       margin-bottom: 20px;
       color: #fff;
+      font-family: 'Press Start 2P', cursive; /* Apply pixel font */
     }
     #game-rules {
       margin-bottom: 20px;
@@ -50,14 +54,14 @@
       cursor: pointer;
     }
 
-    /* Styling for the "Made by Akash Sriram" text */
+    /* Styling for the "Made by Akash Sriram" text with pixel font */
     #credits {
       position: absolute;
       bottom: 30px;
       left: 30px;
       font-size: 18px;
       color: #fff;
-      font-family: Arial, sans-serif;
+      font-family: 'Press Start 2P', cursive; /* Apply pixel font */
     }
 
     /* Styling for the exit button */
@@ -88,7 +92,7 @@
       <ul style="list-style-type: none;">
         <li>Collect treasures to increase your score.</li>
         <br>
-        <li>Avoid obstacles which reduce your score and time in hand.</li>
+        <li>Avoid obstacles which reduce your score.</li>
         <br>
         <li>You have 200 seconds to complete all five levels.</li>
         <br>
