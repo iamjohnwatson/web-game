@@ -156,11 +156,11 @@ class MainScene extends Phaser.Scene {
       { x: 750, y: 550 }        // Bottom-right
     ];
   
-    // Create 2 power-ups at random corners
-    for (let i = 0; i < 2; i++) {  // Increase the number of power-ups
+    // Create 1 power-up at a random corner
+    for (let i = 0; i < 1; i++) {  // Increase the number of power-ups
       const corner = Phaser.Math.RND.pick(corners);
       const powerup = this.powerups.create(corner.x, corner.y, 'powerup');
-      powerup.setScale(1.5);  // Increase the scale to make the power-up larger
+      powerup.setScale(1);  // Increase the scale to make the power-up larger
     }
   
     // Enable overlap detection for power-up collection
