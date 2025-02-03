@@ -47,7 +47,7 @@ class MainScene extends Phaser.Scene {
   // PHASER LIFECYCLE METHODS
   // =============================================
   preload() {
-    this.load.image('avatar', 'assets/player.gif');
+    this.load.image('avatar', 'assets/player.png');
     this.load.image('gold', 'assets/gold.png');
     this.load.image('silver', 'assets/silver.png');
     this.load.image('bronze', 'assets/bronze.png');
