@@ -89,3 +89,31 @@ body {
         padding: 8px 16px;
     }
 }
+#name-input-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  #player-name {
+    padding: 10px;
+    font-size: 18px;
+    margin-right: 10px;
+  }
+  
+  #submit-score {
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  #submit-score:hover {
+    background-color: #45a049;
+  }
+  
+  .leaderboard-entry {
+    margin: 5px 0;
+  }
+  
