@@ -52,7 +52,7 @@ class MainScene extends Phaser.Scene {
     this.load.image('silver', 'assets/silver.png');
     this.load.image('bronze', 'assets/bronze.png');
     this.load.image('hazard', 'assets/spinning_blade.gif');
-    this.load.image('rocks', 'assets/rocks.png');
+    this.load.image('poop', 'assets/poop.png');
     this.load.audio('hit', 'assets/hit.mp3');
     this.load.audio('level_up', 'assets/level_up.mp3');
     this.load.audio('end_game', 'assets/end_game.mp3');
@@ -171,7 +171,7 @@ class MainScene extends Phaser.Scene {
   initializeHazards() {
     this.hazards.clear(true, true);
     const total = 5 + this.currentLevel;
-    const types = ['hazard', 'rocks'];
+    const types = ['hazard', 'poop'];
 
     for (let i = 0; i < total; i++) {
       const hazard = this.hazards.create(0, 0, Phaser.Math.RND.pick(types));
