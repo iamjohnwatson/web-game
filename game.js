@@ -52,7 +52,7 @@ class MainScene extends Phaser.Scene {
     this.load.image('silver', 'assets/silver.png');
     this.load.image('bronze', 'assets/bronze.png');
     this.load.image('hazard', 'assets/spinning_blade.gif');
-    this.load.image('rocks', 'assets/rocks.png');
+    this.load.image('poop', 'assets/poop.png');
     this.load.audio('hit', 'assets/hit.mp3');
     this.load.audio('level_up', 'assets/level_up.mp3');
     this.load.audio('end_game', 'assets/end_game.mp3');
@@ -133,15 +133,43 @@ class MainScene extends Phaser.Scene {
   initializeCollectibles() {
     // Clear existing collectibles
     this.collectibles.clear(true, true);
+  
+    // Max score is 300, distribute points accordingly
+    const maxScore = 500;
+    
+    // Define points per collectible
+    const points = { gold: 5, silver: 3, bronze: 1 };
+    
+    // Calculate how many collectibles of each type we need based on the level
+    const totalCollectibles = 12 + this.currentLevel * 4;  // Number of collectibles increases by 2 with each level
+    
+    // Ensure the total number of collectibles leads to a maximum score of 300
+    let goldCount = Math.floor(totalCollectibles * 0.20);  // 20% golds
+    let silverCount = Math.floor(totalCollectibles * 0.40);  // 40% silvers
+    let bronzeCount = totalCollectibles - (goldCount + silverCount);  // Remaining as bronze
+    
+    // Adjust if the sum is off due to rounding
+    while (goldCount * 5 + silverCount * 3 + bronzeCount * 1 > maxScore) {
+      if (goldCount > 0) goldCount--;
+      else if (silverCount > 0) silverCount--;
+      else bronzeCount--;
+    }
 
     // Generate collectibles (gold, silver, bronze) at random positions
-    const total = 10 + (this.currentLevel * 3); // Increase the number of collectibles as level increases
-    const types = ['gold', 'silver', 'bronze'];
+for (let i = 0; i < goldCount; i++) {
+  const collectible = this.collectibles.create(0, 0, 'gold');
+  this.ensureNoOverlap(collectible, this.collectibles, this.hazards, 100);
+}
 
-    for (let i = 0; i < total; i++) {
-      const collectible = this.collectibles.create(0, 0, Phaser.Math.RND.pick(types));
-      this.ensureNoOverlap(collectible, this.collectibles, this.hazards, 100);
-    }
+for (let i = 0; i < silverCount; i++) {
+  const collectible = this.collectibles.create(0, 0, 'silver');
+  this.ensureNoOverlap(collectible, this.collectibles, this.hazards, 100);
+}
+
+for (let i = 0; i < bronzeCount; i++) {
+  const collectible = this.collectibles.create(0, 0, 'bronze');
+  this.ensureNoOverlap(collectible, this.collectibles, this.hazards, 100);
+}
   }
 
   initializePowerUps() {
@@ -167,17 +195,21 @@ class MainScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.powerups, this.collectPowerUp, null, this);
   }
   
-
   initializeHazards() {
     this.hazards.clear(true, true);
-    const total = 5 + this.currentLevel;
-    const types = ['hazard', 'rocks'];
-
+  
+    // Calculate the total number of hazards based on the current level, increased by 25% per level
+    const baseHazards = 5;
+    const increasedHazards = Math.floor(baseHazards + baseHazards * (0.25 * this.currentLevel));
+  
+    const total = increasedHazards;
+    const types = ['hazard', 'poop'];
+  
     for (let i = 0; i < total; i++) {
       const hazard = this.hazards.create(0, 0, Phaser.Math.RND.pick(types));
-      this.ensureNoOverlap(hazard, this.hazards, this.collectibles, 100);
+      this.ensureNoOverlap(hazard, this.hazards, this.collectibles, 100); // Ensure no overlap for each hazard
     }
-  }
+  }  
 
   ensureNoOverlap(object, group, otherGroup, maxAttempts = 100) {
     let safePosition = false;
@@ -198,24 +230,25 @@ class MainScene extends Phaser.Scene {
     // Log when a collectible is obtained
     console.log(`Collected: ${collectible.texture.key}`);
   
-    if (collectible.texture.key === 'powerup') {
-      this.timeLeft += 20;      // Increase time by 20 seconds
-      this.timeElement.textContent = `TIME: ${this.timeLeft}`;
+    // Increase score based on collectible type
+    const points = { gold: 5, silver: 3, bronze: 1 }[collectible.texture.key];
+    this.score += points;
+    this.scoreElement.textContent = `SCORE: ${this.score}`;
+  
+    // Check if score exceeds 300, prevent it from going beyond
+    if (this.score > 300) {
+      this.score = 300;
+      this.scoreElement.textContent = `SCORE: ${this.score}`;
     }
   
     // Destroy the collectible after collection
     collectible.destroy();
   
-    const points = { gold: 5, silver: 3, bronze: 1 }[collectible.texture.key];
-    this.score += points;
-    this.scoreElement.textContent = `SCORE: ${this.score}`;
-  
+    // Check if all collectibles are collected to advance the level
     if (this.collectibles.countActive(true) === 0) {
       this.advanceLevel();
     }
   }
-  
-
 
   collectPowerUp(player, powerup) {
     this.sound.play('powerupSound'); // Play power-up collection sound
@@ -305,7 +338,7 @@ class MainScene extends Phaser.Scene {
   }
 
  // At the end of the game
-endGame(message) {
+ endGame(message) {
   console.log("Game Over:", message);
   this.physics.pause();
 
@@ -317,15 +350,18 @@ endGame(message) {
   document.getElementById('game-container').style.display = 'none'; // Hide game screen
   document.getElementById('ui-container').style.display = 'none';   // Hide UI container
 
-  // Display the final message
+  // Calculate the final score by adding the remaining time to the score
+  const finalScore = this.score + this.timeLeft;
+
+  // Display the final message with the calculated final score
   const gameOverMessage = document.getElementById('game-over-message');
-  gameOverMessage.innerHTML = `Congratulations! Final Score: ${this.score}`;
+  gameOverMessage.innerHTML = `Congratulations! Final Score: ${finalScore}`;
   gameOverMessage.style.display = 'block'; // Show the final score message
 
   // Create a name input form to allow the user to enter their name
   const nameInputContainer = document.createElement('div');
   nameInputContainer.id = 'name-input-container';
-  nameInputContainer.innerHTML = `
+  nameInputContainer.innerHTML = `  
     <input type="text" id="player-name" placeholder="Enter your name" />
     <button id="submit-score">Submit</button>
   `;
@@ -335,7 +371,7 @@ endGame(message) {
   document.getElementById('submit-score').addEventListener('click', () => {
     const playerName = document.getElementById('player-name').value;
     if (playerName) {
-      this.saveScore(playerName);
+      this.saveScore(playerName, finalScore); // Save the score with the player's name
     } else {
       alert('Please enter a name!');
     }
@@ -346,10 +382,10 @@ endGame(message) {
 }
 
 // Save score with the player's name
-saveScore(playerName) {
+saveScore(playerName, finalScore) {
   const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-  leaderboard.push({ name: playerName, score: this.score });
-  leaderboard.sort((a, b) => b.score - a.score); // Sort leaderboard by score (descending)
+  leaderboard.push({ name: playerName, score: finalScore });
+  leaderboard.sort((a, b) => b.score - a.score); // Sort leaderboard by final score (descending)
 
   // Save the updated leaderboard to localStorage
   localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
