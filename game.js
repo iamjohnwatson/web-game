@@ -58,6 +58,8 @@ class MainScene extends Phaser.Scene {
     this.load.audio('end_game', 'assets/end_game.mp3');
     this.load.image('powerup', 'assets/powerup.png'); // Power-up image
     this.load.audio('powerupSound', 'assets/powerup.mp3'); // Power-up sound
+    this.load.audio('bgMusic', 'assets/background_music.mp3'); // Background music
+    this.load.image('npc', 'assets/npc.png'); // Load NPC image
   }
 
   create() {
@@ -71,11 +73,15 @@ class MainScene extends Phaser.Scene {
     // Initialize game objects
     this.player = this.physics.add.sprite(400, 300, 'avatar')
       .setCollideWorldBounds(true)
-      .setScale(1.5);
+      .setScale(1.2);
     
     this.collectibles = this.physics.add.group();
     this.powerups = this.physics.add.group();
     this.hazards = this.physics.add.group();
+
+    // Play background music once when the scene starts
+    this.bgMusic = this.sound.add('bgMusic', { loop: true, volume: 0.5 }); 
+    this.bgMusic.play();
 
     // Setup controls
     this.controls = this.input.keyboard.createCursorKeys();
@@ -98,6 +104,18 @@ class MainScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.powerups, this.collectPowerUp, null, this);
     this.physics.add.collider(this.player, this.hazards, this.hitHazard, null, this);
 
+    //create npc
+    this.npc = this.physics.add.sprite(600, 300, 'npc')
+    .setCollideWorldBounds(true)
+    .setScale(1.5)
+    .setBounce(1) // NPC bounces off walls
+    .setVelocity(75,75); // Set NPC velocity
+
+    this.setRandomNPCMovement(); // Set random NPC movement
+    
+    // Check collision between player and NPC
+    this.physics.add.collider(this.player, this.npc, this.hitNPC, null, this);
+
     // Start timer
     this.timerEvent = this.time.addEvent({
       delay: 1000,
@@ -115,6 +133,97 @@ class MainScene extends Phaser.Scene {
     if (this.controls.up.isDown) this.player.setVelocityY(-speed);
     if (this.controls.down.isDown) this.player.setVelocityY(speed);
   }
+
+  respawnNPC(npc) {
+    console.log("Respawning NPC in a corner...");
+
+    // Define possible corners
+    const corners = [
+        { x: 50, y: 50 },       // Top-left
+        { x: 750, y: 50 },      // Top-right
+        { x: 50, y: 550 },      // Bottom-left
+        { x: 750, y: 550 }      // Bottom-right
+    ];
+
+    // Pick a random corner
+    const randomCorner = Phaser.Math.RND.pick(corners);
+    
+    // Move NPC to the new position
+    npc.setPosition(randomCorner.x, randomCorner.y);
+}  
+
+  hitNPC(player, npc) {
+    console.log("Player hit The Hunter! Both are frozen for 5 seconds...");
+
+    // Stop player movement
+    this.player.setVelocity(0);
+    this.player.body.moves = false; // Disable player movement
+
+    // Stop NPC movement
+    npc.setVelocity(0);
+    npc.body.moves = false; // Disable NPC movement
+
+    // ✅ Show freeze message
+    let freezeMessage = document.getElementById('freeze-message');
+
+    if (!freezeMessage) {
+        freezeMessage = document.createElement('div');
+        freezeMessage.id = 'freeze-message';
+        freezeMessage.style.position = 'absolute';
+        freezeMessage.style.top = '50%';
+        freezeMessage.style.left = '50%';
+        freezeMessage.style.transform = 'translate(-50%, -50%)';
+        freezeMessage.style.padding = '15px';
+        freezeMessage.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        freezeMessage.style.color = 'white';
+        freezeMessage.style.borderRadius = '8px';
+        freezeMessage.style.fontSize = '24px';
+        document.body.appendChild(freezeMessage);
+    }
+
+    freezeMessage.textContent = "You got caught! Frozen for 5 seconds!";
+    freezeMessage.style.display = 'block';
+
+    // ✅ Respawn NPC in a random corner after 5 seconds
+    this.time.delayedCall(5000, () => {
+        this.player.body.moves = true; // Re-enable player movement
+        npc.body.moves = true; // Re-enable NPC movement
+
+        // Move NPC to a random corner
+        this.respawnNPC(npc);
+
+        // Restart NPC movement
+        this.setRandomNPCMovement();
+
+        freezeMessage.style.display = 'none'; // Hide message
+        console.log("Both player and NPC can move again!");
+    });
+  }
+
+
+setRandomNPCMovement() {
+  if (!this.npc.body.moves) return; // If NPC is frozen, don't move
+
+  this.time.addEvent({
+      delay: 2000, // Every 2 seconds, NPC picks a new direction
+      callback: () => {
+          if (!this.npc.body.moves) return; // If NPC is frozen, don't change direction
+          
+          const speed = 150;
+          const directions = [
+              { x: speed, y: 0 },   // Right
+              { x: -speed, y: 0 },  // Left
+              { x: 0, y: speed },   // Down
+              { x: 0, y: -speed }   // Up
+          ];
+          
+          const randomDirection = Phaser.Math.RND.pick(directions);
+          this.npc.setVelocity(randomDirection.x, randomDirection.y);
+      },
+      loop: true
+  });
+}
+
 
   // =============================================
   // GAME LOGIC METHODS
@@ -344,6 +453,17 @@ for (let i = 0; i < bronzeCount; i++) {
 
   if (this.timerEvent) {
     this.timerEvent.remove();
+
+    // Display game-over message
+    if (this.gameOverElement) {
+      this.gameOverElement.textContent = message;
+      this.gameOverElement.style.display = 'block';
+  }
+  // Stop background music
+  if (this.bgMusic) {
+    this.bgMusic.stop();
+  }
+  this.sound.play('end_game'); // Play game-over sound
   }
 
   // Clear the game screen and show final score
