@@ -181,7 +181,7 @@ class MainScene extends Phaser.Scene {
         document.body.appendChild(freezeMessage);
     }
 
-    freezeMessage.textContent = "You got caught! Frozen for 5 seconds!";
+    freezeMessage.textContent = "The Hunter caught you! Freeze for 5 seconds!";
     freezeMessage.style.display = 'block';
 
     // ✅ Respawn NPC in a random corner after 5 seconds
