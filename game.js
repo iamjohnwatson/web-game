@@ -70,6 +70,28 @@ class MainScene extends Phaser.Scene {
       });
     }
 
+    let isMuted = false;
+
+// Mute button functionality
+document.getElementById('mute-button').addEventListener('click', () => {
+  isMuted = !isMuted;  // Toggle mute state
+
+  // Toggle sound for all audio elements
+  this.bgMusic.setVolume(isMuted ? 0 : 0.5); // Set background music volume (0 for mute, 0.5 for normal)
+  this.sound.getAll().forEach(sound => sound.setVolume(isMuted ? 0 : 1)); // Set volume for all sound effects
+
+  // Update the mute button text
+  document.getElementById('mute-button').textContent = isMuted ? 'Unmute' : 'Mute';
+});
+
+const volumeSlider = document.getElementById('volume-slider');
+
+volumeSlider.addEventListener('input', (event) => {
+  const volume = event.target.value / 100; // Convert to range 0-1
+  this.bgMusic.setVolume(volume); // Adjust background music volume
+  this.sound.getAll().forEach(sound => sound.setVolume(volume)); // Adjust all sound effects
+});
+
     // Initialize game objects
     this.player = this.physics.add.sprite(400, 300, 'avatar')
       .setCollideWorldBounds(true)
